@@ -93,6 +93,8 @@ def find_available_menu_items():
         print("Error connecting to MySQL database:", error)
 
 def order_menu_item():
+    #printing FoodOrder table
+    executeSelect("SELECT * FROM FoodOrder")
     dish_name = input("Enter the dish name you want to order: ")
 
     try:
@@ -119,6 +121,8 @@ def order_menu_item():
                 connection.commit()
                 #insert("FoodOrder", insert_string)
                 print("Order placed successfully!")
+                #printing FoodOrder Table after inserting
+                executeSelect("SELECT * FROM FoodOrder")
             else:
                 print("Dish not found.")
 
@@ -177,6 +181,14 @@ def cancel_food_order():
                 cursor.execute("DELETE FROM FoodOrder WHERE orderNo = %s", (order_no,))
                 connection.commit()
                 print("Order canceled successfully!")
+                # Display all food orders
+                executeSelect("""
+                SELECT fo.orderNo, d.dishName, r.restaurantName, fo.date, fo.time
+                FROM FoodOrder fo
+                JOIN MenuItem mi ON fo.itemNo = mi.itemNo
+                JOIN Dish d ON mi.dishNo = d.dishNo
+                JOIN Restaurant r ON mi.restaurantNo = r.restaurantID
+                """)
             else:
                 print("orderNo is not found in Orders")
     except mysql.connector.Error as error:
